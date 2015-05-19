@@ -5,13 +5,35 @@ import latlngType from "./types/latlng";
 import PopupContainer from "./PopupContainer";
 
 export default class Marker extends PopupContainer {
+
+  constructor() {
+    super();
+    this.dragging = false;
+  }
+
   componentWillMount() {
     super.componentWillMount();
     const {map, position, ...props} = this.props;
     this.leafletElement = Leaflet.marker(position, props);
+    this.leafletElement.on("dragstart", event => {
+      this.dragging = true;
+    });
+    this.leafletElement.on("dragend", event => {
+      this.dragging = false;
+    });
+  }
+
+  componentDidMount() {
+    super.componentDidMount();
+    if (this.props.isPopupOpen) {
+      this.leafletElement.openPopup()
+    }
   }
 
   componentDidUpdate(prevProps) {
+    if (this.props.isPopupOpen) {
+      this.leafletElement.openPopup()
+    }
     if (this.props.position !== prevProps.position) {
       this.leafletElement.setLatLng(this.props.position);
     }
@@ -24,6 +46,9 @@ export default class Marker extends PopupContainer {
     if (this.props.opacity !== prevProps.opacity) {
       this.leafletElement.setOpacity(this.props.opacity);
     }
+    if (this.props.draggable !== prevProps.draggable) {
+      this.leafletElement.draggable.enable();
+    }
   }
 }
 
@@ -31,5 +56,6 @@ Marker.propTypes = {
   position: latlngType.isRequired,
   icon: React.PropTypes.instanceOf(Leaflet.Icon),
   zIndexOffset: React.PropTypes.number,
-  opacity: React.PropTypes.number
+  opacity: React.PropTypes.number,
+  draggable: React.PropTypes.bool
 };

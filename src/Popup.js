@@ -48,8 +48,9 @@ export default class Popup extends MapComponent {
     }
     return null;
   }
+
 }
 
 Popup.propTypes = {
-  position: latlngType
+  position: latlngType,
 };
